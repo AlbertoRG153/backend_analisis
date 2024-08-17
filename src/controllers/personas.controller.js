@@ -62,7 +62,7 @@ export const loginPersona = async (req, res) => {
 
 export const savePersona = async (req, res) => {
     try {
-        const { identidad, nombre, apellido, fecha_nacimiento, direccion, telefono, email, password, estado, nombre_fam, telefono_fam, id_parentesco, tipo_estudio, especialidad, promedio, servicio_militar, relacion_justicia, info_sanitaria, empresa, puesto,años_experiencia } = req.body;
+        const { identidad, nombre, apellido, fecha_nacimiento, direccion, telefono, email, password, estado, nombre_fam, telefono_fam, id_parentesco, tipo_estudio, especialidad, promedio, servicio_militar, relacion_justicia, info_sanitaria, empresa, puesto, anios_experiencia } = req.body;
 
         // Validación básica
         if (!identidad || !nombre || !apellido || !fecha_nacimiento || !direccion || !telefono || !email || !password || !nombre_fam || !telefono_fam ) {
@@ -124,12 +124,12 @@ export const savePersona = async (req, res) => {
             .input("id_persona", sql.BigInt, identidad)
             .input("empresa", sql.VarChar, empresa)
             .input("puesto", sql.VarChar, puesto)
-            .input("años_experiencia", sql.Int, años_experiencia)
+            .input("anios_experiencia", sql.Int, anios_experiencia)
             .input("solicitante_Id_Persona", sql.BigInt, identidad)
             .query(queries.saveExperienciaLaboral);
 
 
-        res.status(201).json({ identidad, nombre, apellido, fecha_nacimiento, direccion, telefono, email, estado, nombre_fam, telefono_fam, id_parentesco, tipo_estudio, especialidad, promedio, servicio_militar, relacion_justicia, info_sanitaria, empresa, puesto, años_experiencia });
+        res.status(201).json({ identidad, nombre, apellido, fecha_nacimiento, direccion, telefono, email, estado, nombre_fam, telefono_fam, id_parentesco, tipo_estudio, especialidad, promedio, servicio_militar, relacion_justicia, info_sanitaria, empresa, puesto, anios_experiencia });
 
     } catch (error) {
         console.error('Error saving persona:', error);
