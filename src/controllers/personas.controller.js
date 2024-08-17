@@ -1,41 +1,110 @@
+import { Int } from 'mssql';
 import { getConnection, sql, queries } from '../database';
 import bcrypt from 'bcrypt';
 
-export const savePersona = async (req, res) => {
+export const gatPersona = async (req, res) =>{
     try {
-        const { id, nombre, apellido, fecha_nacimiento, direccion, telefono, email, password} = req.body;
-
-        // Validación básica
-        if (!id || !nombre || !apellido || !fecha_nacimiento || !direccion || !telefono || !email || !password) {
-            return res.status(400).json({ msg: 'Bad Request. Por favor llena todos los campos' });
-        }
-
-        // Encriptar la contraseña
-        const saltRounds = 10; // Número de rondas de encriptación
-        const hashedPassword = await bcrypt.hash(contrasenia, saltRounds);
-
         const pool = await getConnection();
+        const result = await pool.request().query(queries.getPersona);
+        res.json(result.recordset);
 
-        await pool.request()
-            .input('id', sql.Int, id)
+    } catch (error) {
+        res.status(500);
+        res.send(error.message);
+    }
+}
+
+
+export const savePersona = async (req, res) => {
+    const { identidad, nombre, apellido, fecha_nacimiento, direccion, telefono, email, password, infoLegal, infoSanitaria, Familiares, nombre_fam, telefono_fam, id_parentesco ,solicitante_id_Est, tipo_estudio, especialidad, promedio, id_solicitante_Leg, servicio_militar, relacion_justicia, id_persona_San, info_sanitaria } = req.body;
+
+    if (!identidad || !nombre || !apellido || !fecha_nacimiento || !direccion || !telefono || !email || !password) {
+        return res.status(400).json({ msg: 'Bad Request. Por favor llena todos los campos obligatorios.' });
+    }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const pool = await getConnection();
+    const transaction = new sql.Transaction(pool);
+
+    try {
+        await transaction.begin();
+
+        // Guardar la persona
+        const result = await transaction.request()
+            .input('identidad', sql.BigInt, identidad)
             .input('nombre', sql.VarChar, nombre)
             .input('apellido', sql.VarChar, apellido)
             .input('fecha_nacimiento', sql.Date, fecha_nacimiento)
             .input('direccion', sql.VarChar, direccion)
             .input('telefono', sql.VarChar, telefono)
             .input('email', sql.VarChar, email)
-            .input('password', sql.VarChar, hashedPassword) //la contrasenia ya encriptada es la que mando a guardar a la ddbb
+            .input('password', sql.VarChar, hashedPassword)
             .query(queries.savePersona);
+        
+        const personaId = result.recordset[0].ID; // Asumiendo que tu consulta devuelve el ID generado
 
-        res.status(201).json({ id, nombre, apellido, fecha_nacimiento, direccion, telefono, email });
+        // Insertar en la tabla Solicitantes
+        await transaction.request()
+            .input('ID_Persona', sql.Int, personaId)
+            .query(queries.saveSolicitantes);
+
+        // Obtener el ID del solicitante
+        const solicitante_Id_Persona = (await transaction.request()
+            .input('ID_Persona', sql.Int, personaId)
+            .query(queries.getSolicitanteId)).recordset[0].ID;
+       
+        // Insertar en InformacionLegal, InformacionSanitaria y Estudios
+        if (estudios) {
+                    await pool.request()
+                        .input("solicitante_id", sql.Int, solicitante_id_Est)
+                        .input("tipo_estudio", sql.VarChar, tipo_estudio)
+                        .input("especialidad", sql.VarChar, especialidad)
+                        .input("promedio", sql.Decimal, promedio)
+                        .input("solicitantes_id_persona", sql.Int, solicitante_Id_Persona)
+                        .query(queries.saveEstudios);
+        }
+
+        if (infoLegal) {
+            await transaction.request()
+                .input("id_solicitante_leg", sql.Int, id_solicitante_Leg)
+                .input("servicio_militar", sql.VarChar, servicio_militar)
+                .input("relacion_justicia", sql.VarChar, relacion_justicia)
+                .input("solicitantes_id_persona", sql.Int, solicitante_Id_Persona)
+                .query(queries.saveInfoLegal);
+        }
+
+        if (infoSanitaria) {
+            await transaction.request()
+                .input("id_persona", sql.Int, id_persona_San)
+                .input("infor_sanitaria", sql.VarChar, info_sanitaria)
+                .input("solicitantes_id_Persona", sql.Int, solicitante_Id_Persona)
+                .query(queries.saveInfoSanitaria);
+        }
+
+        if (Familiares){
+            await transaction.request()
+                .input("nombre_fam", sql.VarChar, nombre_fam)
+                .input("telefono_fam", sql.VarChar, telefono_fam)
+                .input("id_parentesco", sql.Int, id_parentesco)
+                .input("solicitantes_id_persona", sql.Int, solicitante_Id_Persona)
+                .query(queries.saveFamilia);
+        }
+
+        await transaction.commit();
+
+        res.status(201).json({ id: personaId });
 
     } catch (error) {
-        console.error('Error saving persona:', error);
-        res.status(500).json({ error: 'Internal Server Error', message: 'Error al guardar la persona.' });
+        await transaction.rollback();
+        console.error('Error saving persona and related data:', error);
+        res.status(500).json({ error: 'Internal Server Error', message: 'Error al guardar la información.' });
     }
 };
 
 
+/*
 export const saveInfoFamilia = async (req, res) => {
     try {
         const { solicitante_id, id_familiar, nombre, telefono, id_parentesco } = req.body;
@@ -135,4 +204,4 @@ export const saveInfoSanitaria = async (req, res) => {
         console.error('Error saving informacion legal:', error);
         res.status(500).json({ error: 'Internal Server Error', message: 'Error al guardar la información legal de persona' });
     }
-}
+}*/
