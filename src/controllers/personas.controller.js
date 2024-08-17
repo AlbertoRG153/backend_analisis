@@ -206,10 +206,10 @@ export const savePersona = async (req, res) => {
 
 export const savePersona = async (req, res) => {
     try {
-        const { identidad, nombre, apellido, fecha_nacimiento, direccion, telefono, email, password, estado, id_familiar, nombre_fam, telefono_fam, id_parentesco, tipo_estudio, especialidad, promedio, servicio_militar, relacion_justicia, info_sanitaria } = req.body;
+        const { identidad, nombre, apellido, fecha_nacimiento, direccion, telefono, email, password, estado, nombre_fam, telefono_fam, id_parentesco, tipo_estudio, especialidad, promedio, servicio_militar, relacion_justicia, info_sanitaria } = req.body;
 
         // Validación básica
-        if (!identidad || !nombre || !apellido || !fecha_nacimiento || !direccion || !telefono || !email || !password || !nombre_fam || !telefono_fam || id_parentesco) {
+        if (!identidad || !nombre || !apellido || !fecha_nacimiento || !direccion || !telefono || !email || !password || !nombre_fam || !telefono_fam ) {
             return res.status(400).json({ msg: 'Bad Request. Por favor llena todos los campos' });
         }
 
@@ -238,8 +238,8 @@ export const savePersona = async (req, res) => {
             .query(queries.saveSolicitantes);
 
         await pool.request()
-            .input("solicitante_id_Persona", sql.BigInt, identidad)
-            .input("id_familiar", sql.BigInt, id_familiar)
+            .input("solicitante_Id_Persona", sql.BigInt, identidad)
+            .input("id_familiar", sql.BigInt, identidad)
             .input("nombre_fam", sql.VarChar, nombre_fam)
             .input("telefono_fam", sql.VarChar, telefono_fam)
             .input("id_parentesco", sql.Int, id_parentesco)
@@ -249,22 +249,22 @@ export const savePersona = async (req, res) => {
             .input("tipo_estudio", sql.VarChar, tipo_estudio)
             .input("especialidad", sql.VarChar, especialidad)
             .input("promedio", sql.Decimal, promedio)
-            .input("solicitantes_id", sql.BigInt, identidad)
+            .input("solicitante_Id_Persona", sql.BigInt, identidad)
             .query(queries.saveEstudios);
 
         await pool.request()
             .input("servicio_militar", sql.VarChar, servicio_militar)
             .input("relacion_justicia", sql.VarChar, relacion_justicia)
-            .input("solicitantes_id", sql.BigInt, identidad)
+            .input("solicitante_id_Persona", sql.BigInt, identidad)
             .query(queries.saveInfoLegal);
 
         await pool.request()
-            .input("id_persona", sql.BigInt, identidad)
+            .input("id_persona_San", sql.BigInt, identidad)
             .input("info_sanitaria", sql.VarChar, info_sanitaria)
-            .input("solicitantes_id", sql.Int, identidad)
+            .input("solicitante_Id_Persona", sql.BigInt, identidad)
             .query(queries.saveInfoSanitaria);
 
-        res.status(201).json({ identidad, nombre, apellido, fecha_nacimiento, direccion, telefono, email, estado, id_familiar, nombre_fam, telefono_fam, id_parentesco, tipo_estudio, especialidad, promedio, servicio_militar, relacion_justicia, info_sanitaria });
+        res.status(201).json({ identidad, nombre, apellido, fecha_nacimiento, direccion, telefono, email, estado, nombre_fam, telefono_fam, id_parentesco, tipo_estudio, especialidad, promedio, servicio_militar, relacion_justicia, info_sanitaria });
 
     } catch (error) {
         console.error('Error saving persona:', error);
