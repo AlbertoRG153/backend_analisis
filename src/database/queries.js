@@ -11,33 +11,7 @@ export const queries = {
     getLoginEmpresa: `SELECT * FROM Empresas WHERE email = @email AND contrasenia = @contrasenia;`,
 
     getAllPersonas: `SELECT * FROM Personas`,
-    /*savePersona: `
-        EXEC sp_SavePersona
-            @identidad = @identidad,
-            @nombre = @nombre,
-            @apellido = @apellido,
-            @fecha_nacimiento = @fecha_nacimiento,
-            @direccion = @direccion,
-            @telefono = @telefono,
-            @email = @email,
-            @password = @password,
-            @infoLegal = @infoLegal,
-            @infoSanitaria = @infoSanitaria,
-            @Familiares = @Familiares,
-            @id_Familiar = @id_Familiar,
-            @nombre_fam = @nombre_fam,
-            @telefono_fam = @telefono_fam,
-            @id_parentesco = @id_parentesco,
-            @solicitante_id_Est = @solicitante_id_Est,
-            @tipo_estudio = @tipo_estudio,
-            @especialidad = @especialidad,
-            @promedio = @promedio,
-            @id_solicitante_Leg = @id_solicitante_Leg,
-            @servicio_militar = @servicio_militar,
-            @relacion_justicia = @relacion_justicia,
-            @id_persona_San = @id_persona_San,
-            @info_sanitaria = @info_sanitaria
-    `*/
+    getPersonaByEmail: `SELECT * FROM Personas WHERE email = @email`,
     savePersona: `INSERT INTO Personas (ID_Persona, Nombre, Apellido, Fecha_Nacimiento, Direccion, Telefono, Email, Password)
                     VALUES (@identidad, @nombre, @apellido, @fecha_nacimiento, @direccion, @telefono, @email, @password);`,
     saveSolicitantes: 'INSERT INTO Solicitantes (ID_Persona, Estado) VALUES (@ID_Persona, @estado);',

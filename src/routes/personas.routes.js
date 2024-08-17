@@ -6,7 +6,7 @@ const router = Router();
 
 router.post('/personas/save', savePersona)
 
-router.get('/personas/login', loginPersona)
+router.post('/personas/login', loginPersona)
 
 router.get('/personas/get', getPersona)
 

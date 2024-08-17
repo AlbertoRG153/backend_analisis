@@ -37,7 +37,7 @@ export const loginPersona = async (req, res) => {
         const persona = result.recordset[0];
 
         // Verifica la contraseña
-        const match = await bcrypt.compare(password, persona.password);
+        const match = await bcrypt.compare(password, persona.Password);
 
         if (!match) {
             return res.status(401).json({ msg: 'Unauthorized. La contraseña es incorrecta.' });
@@ -47,10 +47,10 @@ export const loginPersona = async (req, res) => {
         res.status(200).json({
             message: 'Login exitoso',
             persona: {
-                id: persona.ID,
-                nombre: persona.nombre,
-                apellido: persona.apellido,
-                email: persona.email,
+                id: persona.ID_Persona,
+                nombre: persona.Nombre,
+                apellido: persona.Apellido,
+                email: persona.Email,
             }
         });
 
