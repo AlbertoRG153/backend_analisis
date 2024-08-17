@@ -1,6 +1,19 @@
 import { getConnection, sql, queries } from '../database';
 import bcrypt from 'bcrypt';
 
+export const getPersona = async (req, res) => {
+
+    try {
+        const pool = await getConnection();
+        const result = await pool.request().query(queries.getAllPersonas);
+        res.json(result.recordset);
+
+    } catch (error) {
+        res.status(500);
+        res.send(error.message);
+    }
+};
+
 export const loginPersona = async (req, res) => {
     const { email, password } = req.body;
 
@@ -47,7 +60,7 @@ export const loginPersona = async (req, res) => {
 };
 
 export const savePersona = async (req, res) => {
-    const { identidad, nombre, apellido, fecha_nacimiento, direccion, telefono, email, password, infoLegal, infoSanitaria, Familiares, nombre_fam, telefono_fam, id_parentesco ,solicitante_id_Est, tipo_estudio, especialidad, promedio, id_solicitante_Leg, servicio_militar, relacion_justicia, id_persona_San, info_sanitaria } = req.body;
+    const { identidad, nombre, apellido, fecha_nacimiento, direccion, telefono, email, password, infoLegal, infoSanitaria, Familiares, nombre_fam, telefono_fam, id_parentesco, solicitante_id_Est, tipo_estudio, especialidad, promedio, id_solicitante_Leg, servicio_militar, relacion_justicia, id_persona_San, info_sanitaria } = req.body;
 
     if (!identidad || !nombre || !apellido || !fecha_nacimiento || !direccion || !telefono || !email || !password) {
         return res.status(400).json({ msg: 'Bad Request. Por favor llena todos los campos obligatorios.' });
