@@ -2,17 +2,51 @@ import { Int } from 'mssql';
 import { getConnection, sql, queries } from '../database';
 import bcrypt from 'bcrypt';
 
-export const gatPersona = async (req, res) =>{
+export const loginPersona = async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ msg: 'Bad Request. Por favor proporciona email y password.' });
+    }
+
     try {
         const pool = await getConnection();
-        const result = await pool.request().query(queries.getPersona);
-        res.json(result.recordset);
+
+        // Buscar al usuario por email
+        const result = await pool.request()
+            .input('email', sql.VarChar, email)
+            .query(queries.getPersonaByEmail);
+
+        if (result.recordset.length === 0) {
+            return res.status(401).json({ msg: 'Unauthorized. El email no está registrado.' });
+        }
+
+        const persona = result.recordset[0];
+
+        // Verifica la contraseña
+        const match = await bcrypt.compare(password, persona.password);
+
+        if (!match) {
+            return res.status(401).json({ msg: 'Unauthorized. La contraseña es incorrecta.' });
+        }
+
+        // Login exitoso
+        res.status(200).json({
+            message: 'Login exitoso',
+            persona: {
+                id: persona.ID,
+                nombre: persona.nombre,
+                apellido: persona.apellido,
+                email: persona.email,
+            }
+        });
 
     } catch (error) {
-        res.status(500);
-        res.send(error.message);
+        console.error('Error during login:', error);
+        res.status(500).json({ error: 'Internal Server Error', message: 'Error durante el login.' });
     }
-}
+};
+
 
 
 export const savePersona = async (req, res) => {

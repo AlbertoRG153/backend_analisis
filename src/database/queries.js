@@ -1,5 +1,5 @@
 import { saveEmpresa } from "../controllers/empresas.controllers";
-import { saveEstudios, saveInfoFamilia, saveInfoLegal, saveInfoSanitaria, savePersona } from "../controllers/personas.controller";
+import { loginPersona, saveEstudios, saveInfoFamilia, saveInfoLegal, saveInfoSanitaria, savePersona } from "../controllers/personas.controller";
 
 export const queries = {
 
@@ -17,5 +17,6 @@ export const queries = {
     saveInfoFamilia: 'INSERT INTO Familiares (Solicitantes_ID_Persona, ID_Persona_Familiar, IDRelacion, Nombre, Telefono) VALUES (@solicitante_id, @id_familiar, @nombre, @telefono, @id_parentesco)',
     saveInfoLegal: 'INSERT INTO Datos_Legales (ID_Solicitante, Servicio_Militar, Relacion_Justicia, Solicitantes_ID_Persona) VALUES (@id_solicitante, @servicio_militar, @relacion_justicia, @solicitantes_id)',
     saveInfoSanitaria: 'INSERT INTO Datos_Sanitarios (ID_Persona, Informacion_Saniaria, Solicitantes_ID_Personma) VALUES (@id_persona, @info_sanitaria, @solicitantes_id)',
-    getPersona: 'SELECT @ID_Persona FROM Personas'
+    getPersona: 'SELECT @ID_Persona FROM Personas',
+    getPersonaByEmail: 'SELECT Identidad, Nombre, Apellido, Fecha_nacimiento, Direccion, Telefono, Email, Password FROM Personas WHERE Email = @email'
 };
