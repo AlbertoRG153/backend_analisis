@@ -1,10 +1,9 @@
-// routes/personas.routes.js
 import { Router } from "express";
-import { saveEstudios, saveInfoFamilia, saveInfoLegal, saveInfoSanitaria, savePersona } from "../controllers/personas.controller";
+import { savePersona ,saveEstudios, saveInfoFamilia, saveInfoLegal, saveInfoSanitaria } from "../controllers/personas.controller";
 
 const router = Router();
 
-router.post('/persona/save', savePersona);
+router.post('/perona/save', savePersona);
 
 router.post('/persona/familia/save', saveInfoFamilia);
 
