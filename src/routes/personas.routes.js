@@ -10,7 +10,7 @@ router.post('/personas/login', loginPersona)
 
 router.get('/personas/get', getPersona)
 
-router.get('/personas/getSolEmplo', getSolEmpleo)
+router.get('/personas/getSolEmpleo', getSolEmpleo)
 
 router.post('/personas/apliTrabajo', aplicarTrabajo)
 
