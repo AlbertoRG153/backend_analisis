@@ -136,3 +136,43 @@ export const savePersona = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error', message: 'Error al guardar la persona.' });
     }
 };
+
+export const getSolEmpleo = async (req, res) => {
+
+    try {
+        const pool = await getConnection();
+        const result = await pool.request().query(queries.getAllSolEmpleo);
+        res.json(result.recordset);
+
+    } catch (error) {
+        res.status(500);
+        res.send(error.message);
+    }
+};
+
+export const aplicarTrabajo = async (req, res) => {
+    try {
+        // Asegúrate de que el ID_Solicitante esté disponible en req.user
+        if (!req.user || !req.body.id_solicitudPuesto || !req.body.id_solicitud || !req.body.tipo_empleo) {
+            return res.status(400).json({ msg: 'Bad Request. Por favor completa todos los campos.' });
+        }
+
+        const { id_solicitudPuesto, id_solicitud, tipo_empleo } = req.body;
+        const id_solicitante = req.user.id; // Obtén el ID del solicitante del token o sesión
+
+        const pool = await getConnection();
+
+        await pool.request()
+            .input('ID_Solicitud', sql.BigInt, id_solicitud)
+            .input('ID_Solicitante', sql.BigInt, id_solicitante)
+            .input('ID_Puesto', sql.BigInt, id_solicitudPuesto) // Asegúrate de que esto sea correcto
+            .input('Tipo_Empleo', sql.VarChar, tipo_empleo) // Asumiendo que es un tipo varchar
+            .query(queries.saveSolicitudesTipo);
+
+        res.status(201).json({ id_solicitante, id_solicitud, id_solicitudPuesto, tipo_empleo });
+    } catch (error) {
+        console.error('Error applying to job:', error);
+        res.status(500).json({ error: 'Internal Server Error', message: 'Error al aplicar al puesto de trabajo.' });
+    }
+};
+

@@ -130,5 +130,30 @@ export const loginEmpresa = async (req, res) => {
     }
 };
 
+export const SaveSolicitudEmpleo = async (req, res) => {
+    try{
+        const { tipo_puesto, limitaciones, deseos, salario_max, salario_min} = req.body;
+
+        if (!tipo_puesto || !limitaciones || !deseos || !salario_max || !salario_min) {
+            return res.status(400).json({ msg: 'Bad Request. Por favor completar todos los campos'});
+        }
+
+        const pool = await getConnection();
+
+            await pool.request()
+                .input('tipo_puesto', sql.VarChar, tipo_puesto)
+                .input('limitaciones', sql.VarChar, limitaciones)
+                .input('deseos', sql.VarChar, deseos)
+                .input('salario_max', sql.Float, salario_max)
+                .input('salario_min', sql.Float, salario_min)
+                .query(queries.saveSolicitudPuesto);
+
+            res.status(201).json({ tipo_puesto, limitaciones, deseos, salario_max, salario_min });
+
+    } catch (error) {
+        console.error('Error Creating Solicitud de Empleo', error);
+        res.status(500).json({ error: 'Internal Server Error', message: 'Error al guardar la Solicitud de Empleo' });
+    }
+}
 
 

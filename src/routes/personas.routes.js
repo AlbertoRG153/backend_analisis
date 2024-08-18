@@ -1,6 +1,6 @@
 // routes/personas.routes.js
 import { Router } from "express";
-import { getPersona, loginPersona, savePersona } from "../controllers/personas.controller";
+import { aplicarTrabajo, getPersona, getSolEmpleo, loginPersona, savePersona } from "../controllers/personas.controller";
 
 const router = Router();
 
@@ -10,4 +10,8 @@ router.post('/personas/login', loginPersona)
 
 router.get('/personas/get', getPersona)
 
-export default router;
+router.get('/personas/getSolEmplo', getSolEmpleo)
+
+router.post('/personas/apliTrabajo', aplicarTrabajo)
+
+export default router
