@@ -10,6 +10,8 @@ export const queries = {
                             WHERE ID_Empresa = @Id`,
     getLoginEmpresa: `SELECT * FROM Empresas WHERE email = @email AND contrasenia = @contrasenia;`,
     saveSolicitudPuesto: 'INSERT INTO Solicitudes_Empleo (Tipo_Puesto_Solicitado, Limitaciones, Deseos, SalarioMax, SalarioMin) VALUES (@tipo_puesto, @limitaciones, @deseos, @salario_max, @salario_min)',
+    saveSolicitudesTipo: 'INSERT INTO Solicitudes_Tipos (ID_Solicitud, ID_Puesto, Tipo_Empleo) VALUES (@ID_Solicitud, @ID_Puesto, @Tipo_Empleo)',
+    
 
     getAllPersonas: `SELECT * FROM Personas`,
     getPersonaByEmail: `SELECT * FROM Personas WHERE email = @email`,
@@ -22,6 +24,6 @@ export const queries = {
     saveInfoSanitaria: 'INSERT INTO Datos_Sanitarios (ID_Persona, Informacion_Sanitaria, Solicitantes_ID_Persona) VALUES (@id_persona_San, @info_sanitaria, @solicitante_id_Persona)',
     saveExperienciaLaboral: `INSERT INTO Experiencia_Laboral (ID_Solicitante, Empresa, Puesto, Anios_Experiencia, Solicitantes_ID_Persona) VALUES (@id_persona, @empresa, @puesto, @anios_experiencia, @solicitante_Id_Persona)`,
     getAllSolEmpleo: 'SELECT * FROM Solicitudes_Empleo',
-    saveSolicitudesTipo: 'INSERT INTO Solicitudes_Tipos (ID_Solicitud, ID_Solicitante, ID_Puesto, TipoPuesto) VALUES (@ID_Solicitud, @ID_Solicitante, @ID_Puesto, , @Tipo_Empleo)',
+    ApliCTrabajo: 'UPDATE Solicitudes_Tipos SET ID_Solicitante = @ID_Solicitante WHERE ID_Solicitud = @ID_Solicitud',
     saveReqEmpleo: 'INSERT INTO Requisitos_Empleo (ID_Solicitante, Tipo_Puesto, Condiciones, Salario, Solicitantes_ID_Persona) VALUES (@id_solicitante, @tipo_puesto, @condiciones, @salario, @id_solicitantes)'
 };

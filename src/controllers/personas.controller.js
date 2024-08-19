@@ -183,11 +183,11 @@ export const saveRequisitoEmpleo = async (req, res) => {
 export const aplicarTrabajo = async (req, res) => {
     try {
         // el ID_Solicitante debe estar disponible en req.user
-        if (!req.user || !req.body.id_solicitudPuesto || !req.body.id_solicitud || !req.body.tipo_empleo) {
+        if (!req.user || !req.body.id_solicitudPuesto) {
             return res.status(400).json({ msg: 'Bad Request. Por favor completa todos los campos.' });
         }
 
-        const { id_solicitudPuesto, id_solicitud, tipo_empleo } = req.body;
+        const { id_solicitud, tipo_empleo } = req.body;
         const id_solicitante = req.user.id; // Obtener ID del solicitante del token o sesión
 
         const pool = await getConnection();
@@ -195,8 +195,7 @@ export const aplicarTrabajo = async (req, res) => {
         await pool.request()
             .input('ID_Solicitud', sql.BigInt, id_solicitud)
             .input('ID_Solicitante', sql.BigInt, id_solicitante)
-            .input('ID_Puesto', sql.BigInt, id_solicitudPuesto)
-            .input('Tipo_Empleo', sql.VarChar, tipo_empleo)
+            .query(queries.ApliCTrabajo)
 
         res.status(201).json({ id_solicitante, id_solicitud, id_solicitudPuesto, tipo_empleo });
     } catch (error) {

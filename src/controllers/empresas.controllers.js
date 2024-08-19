@@ -132,7 +132,7 @@ export const loginEmpresa = async (req, res) => {
 
 export const SaveSolicitudEmpleo = async (req, res) => {
     try{
-        const { tipo_puesto, limitaciones, deseos, salario_max, salario_min} = req.body;
+        const { tipo_puesto, limitaciones, deseos, salario_max, salario_min, id_solicitudPuesto, tipo_empleo} = req.body;
 
         if (!tipo_puesto || !limitaciones || !deseos || !salario_max || !salario_min) {
             return res.status(400).json({ msg: 'Bad Request. Por favor completar todos los campos'});
@@ -147,6 +147,23 @@ export const SaveSolicitudEmpleo = async (req, res) => {
                 .input('salario_max', sql.Float, salario_max)
                 .input('salario_min', sql.Float, salario_min)
                 .query(queries.saveSolicitudPuesto);
+
+            const result = await pool.request()
+                .query(queries.getAllSolEmpleo);
+
+            if (result.recordset.length === 0) {
+                return res.status(401).json({ msg: 'Unauthorized. No hay se genero el empleo de forma eficiente'});
+            }
+
+            const Sol_Empleo = result.recordset[0];
+
+            const id_SolEmpleo = Sol_Empleo.ID_Solicitud
+
+            await pool.request()
+            .input('ID_Solicitud', sql.Int, id_SolEmpleo)
+            .input('ID_Puesto', sql.Int, id_solicitudPuesto)
+            .input('Tipo_Empleo', sql.VarChar, tipo_empleo)
+            .query(queries.saveSolicitudesTipo)
 
             res.status(201).json({ tipo_puesto, limitaciones, deseos, salario_max, salario_min });
 
