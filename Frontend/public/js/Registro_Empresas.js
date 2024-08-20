@@ -1,33 +1,48 @@
 document.getElementById('empresaRegisterForm').addEventListener('submit', async function(event) {
     event.preventDefault();
-    const formData = new FormData(event.target);
-    const data = Object.fromEntries(formData.entries());
-    let isValid = validateForm(data);
+    
+    const form = event.target;
+    const formData = new FormData(form);
 
-    if (isValid) {
-        try {
-            const response = await fetch('http://localhost:4000/empresa/save', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
+    const datos = {
+        nombre: formData.get('nombre'),
+        cif: formData.get('cif'),
+        director: formData.get('director'),
+        direccion: formData.get('direccion'),
+        telefono: formData.get('telefono'),
+        email: formData.get('email'),
+        estado: 1, // valor fijo
+        password: formData.get('password')
+        
+    };
 
-            if (response.ok) {
-                const result = await response.json();
-                alert('Registro exitoso');
-                console.log('Empresa registrada:', result);
-            } else {
-                const error = await response.json();
-                alert('Error en el registro: ' + error.msg);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Hubo un error en el envío del formulario');
+    // Validar los datos
+    const validation = validateForm(datos);
+    if (!validation) {
+        alert('Error: ' + validation.msg);
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:4000/empresa/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datos)
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert('Empresa registrada con éxito');
+        } else {
+            alert('Error: ' + result.msg);
         }
+    } catch (error) {
+        console.error('Error:', error);
     }
 });
+
 
 document.getElementById('updateButton').addEventListener('click', async function() {
     const empresaId = document.getElementById('empresaId').value;

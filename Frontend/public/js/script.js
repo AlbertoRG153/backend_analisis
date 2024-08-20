@@ -1,7 +1,7 @@
 document.getElementById('loginForm').addEventListener('submit', function(event) {
     event.preventDefault();
     
-    const username = document.getElementById('username').value;
+    const email = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
     fetch('http://localhost:4000/personas/login', {
@@ -9,17 +9,17 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ email, password })
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
+        if (data.persona) { 
             // Guardar el personaID en localStorage
-            localStorage.setItem('personaID', data.personaID);
+            localStorage.setItem('personaID', data.persona.id);
             // Redirigir a la página principal
             window.location.href = '/principal.html';
         } else {
-            alert('Error: ' + data.message);
+            alert('Error: ' + data.msg);
         }
     })
     .catch(error => console.error('Error:', error));

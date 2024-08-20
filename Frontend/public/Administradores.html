@@ -248,12 +248,12 @@
                     data.forEach(empresa => {
                         rows += `
                             <tr>
-                                <td>${empresa.nombre}</td>
-                                <td>${empresa.cif}</td>
-                                <td>${empresa.director}</td>
+                                <td>${empresa.Nombre}</td>
+                                <td>${empresa.CIF}</td>
+                                <td>${empresa.Director}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-warning" onclick="editEmpresa(${empresa.id})">Editar</button>
-                                    <button class="btn btn-sm btn-danger" onclick="deleteEmpresa(${empresa.id}, '${empresa.nombre}')">Eliminar</button>
+                                    <button class="btn btn-sm btn-warning" onclick="editEmpresa(${empresa.ID_Empresa})">Editar</button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteEmpresa(${empresa.ID_Empresa}, '${empresa.Nombre}')">Eliminar</button>
                                 </td>
                             </tr>
                         `;
@@ -265,14 +265,14 @@
             // Función para editar empresa
             window.editEmpresa = function (id) {
                 $.get(`http://localhost:4000/empresa/get/${id}`, function (data) {
-                    $("#empresaId").val(data.id);
-                    $("#nombreEmpresa").val(data.nombre);
-                    $("#cif").val(data.cif);
-                    $("#director").val(data.director);
-                    $("#direccionEmpresa").val(data.direccion);
-                    $("#telefonoEmpresa").val(data.telefono);
-                    $("#correoEmpresa").val(data.email);
-                    $("#contraseñaEmpresa").val(data.password);
+                    $("#empresaId").val(data.empresa.ID_Empresa);
+                    $("#nombreEmpresa").val(data.Nombre);
+                    $("#cif").val(data.CIF);
+                    $("#director").val(data.Director);
+                    $("#direccionEmpresa").val(data.Direccion);
+                    $("#telefonoEmpresa").val(data.Telefono);
+                    $("#correoEmpresa").val(data.Email);
+                    $("#contraseñaEmpresa").val(data.Password);
                     $("#editEmpresaModal").modal("show");
                 });
             }
@@ -303,10 +303,10 @@
             }
 
             // Función para eliminar empresa
-            window.deleteEmpresa = function (id, nombre) {
-                if (confirm(`¿Estás seguro de que deseas eliminar ${nombre}?`)) {
+            window.deleteEmpresa = function (ID_Empresa, Nombre) {
+                if (confirm(`¿Estás seguro de que deseas eliminar ${Nombre}?`)) {
                     $.ajax({
-                        url: `http://localhost:4000/empresa/delete/${id}`,
+                        url: `http://localhost:4000/empresa/delete/${ID_Empresa}`,
                         type: 'DELETE',
                         success: function () {
                             fetchEmpresas();

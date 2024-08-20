@@ -1,27 +1,33 @@
-$(document).ready(function() {
-    fetchEmpresas();
+document.addEventListener("DOMContentLoaded", function() {
+    fetchEmpresas(),
+    fetchPuestos();
+});
 
-    // Función para obtener empresas y renderizarlas en caja1
-    function fetchEmpresas() {
-        $.get("http://localhost:4000/empresas/get", function(data) {
+function fetchEmpresas() {
+    fetch("http://localhost:4000/empresas/get")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('la red no responde  ok');
+            }
+            return response.json();
+        })
+        .then(data => {
             let content = "";
             data.forEach(empresa => {
                 content += `
-                    <div class="inner-box" data-toggle="modal" data-target="#myModal1">
-                        <div id="titulo-cajas"><i class="fa-solid fa-building"></i> <h5>${empresa.nombre}</h5></div>
-                        <p style="color: #B2B2B2;">${empresa.direccion}</p>
-                        <p style="color: #B2B2B2;">${empresa.descripcion}</p>
+                    <div class="inner-box" data-toggle="modal" data-target="#myModal1" onclick="fetchEmpresaById(${empresa.ID_Empresa})">
+                        <div id="titulo-cajas"><i class="fa-solid fa-building"></i> <h5>${empresa.Nombre}</h5></div>
+                        <p style="color: #B2B2B2;">${empresa.Direccion}</p>
+                        <p style="color: #B2B2B2;">${empresa.Telefono}</p>
                     </div>
                 `;
             });
-            $("#caja1").html(content);
+            document.getElementById("caja1").innerHTML = content;
+        })
+        .catch(error => {
+            console.error('este es el problema:', error);
         });
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    fetchPuestos();
-
+}
     // Función para obtener puestos
     function fetchPuestos() {
         fetch("http://localhost:4000/puestos/get")
@@ -30,10 +36,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 let content = "";
                 data.forEach(puesto => {
                     content += `
-                        <div class="inner-box" data-toggle="modal" data-target="#myModal2" onclick="renderContrato(${puesto.id_puesto}, ${puesto.id_tipo_contrato}, ${puesto.id_solicitud})">
+                        <div class="inner-box" data-toggle="modal" data-target="#myModal2" onclick="renderContrato(${puesto.ID_Puesto}, ${puesto.IdTipoContrato})">
                             <div id="titulo-cajas"><i class="fa-solid fa-briefcase"></i><h5>${puesto.Tipo_Puesto}</h5></div>
-                            <p style="color: #B2B2B2;">${puesto.tipo_contrato}</p>
-                            <p style="color: #B2B2B2;">Sueldo: ${puesto.Sueldo}</p>
+                            <p style="color: #B2B2B2;">${puesto.TipoContrato}</p>
+                            <p style="color: #B2B2B2;">Empresa: ${puesto.Empresa}</p>
                         </div>
                     `;
                 });
@@ -41,11 +47,11 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => console.error('Error al obtener los puestos:', error));
     }
-});
 
-function renderContrato(id_puesto, id_tipo_contrato, id_solicitud) {
+
+function renderContrato(id_puesto, id_tipo_contrato) {
     // Guardar id_solicitud en localStorage
-    localStorage.setItem('id_solicitud', id_solicitud);
+    localStorage.setItem('idPuesto', id_solicitud);
 
     //solicitud para obtener los detalles del contrato
     fetch(`http://localhost:4000/contrato/${id_puesto}/${id_tipo_contrato}`)
@@ -95,4 +101,25 @@ function postularPuesto() {
     .catch(error => {
         console.error('Error al enviar la solicitud:', error);
     });
+}
+
+function fetchEmpresaById(id) {
+    fetch(`http://localhost:4000/empresa/get/${id}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('la red no responde ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('empresaNombre').textContent = data.Nombre;
+            document.getElementById('empresaDirector').textContent = `CEO: ${data.Director}`;
+            document.getElementById('empresaCIF').textContent = `CIF: ${data.CIF}`;
+            document.getElementById('empresaTelefono').textContent = data.Telefono;
+            document.getElementById('empresaDireccion').textContent = data.Direccion;
+            document.getElementById('empresaEmail').textContent = data.Email;
+        })
+        .catch(error => {
+            console.error('Error fetching empresa data:', error);
+        });
 }
