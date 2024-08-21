@@ -33,14 +33,21 @@
             var username = document.getElementById('username').value;
             var password = document.getElementById('password').value;
 
-            if (username === 'admin' && password === 'admin') {
+             if (username === 'admin' && password === 'admin') {
+                speak("Login correcto");
                 alert('¡Inicio de sesión exitoso!');
                 
                 window.location.href = 'Administradores.html';
             } else {
+                speak("Login incorrecto");
                 alert('Usuario o contraseña incorrectos.');
             }
         });
+        function speak(text) {
+            var msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'es-ES'; 
+            window.speechSynthesis.speak(msg);
+        }
     </script>
 </body>
 
