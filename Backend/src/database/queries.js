@@ -50,8 +50,22 @@ export const queries = {
     saveTipoRequisito: `INSERT INTO TiposRequisitos (IDTipoRequisito, IdRequisito, ID_Puesto, Tipo) VALUES
                             (@id_tipo_requisito, @id_requisito, @id_puesto, @tipo);`,
 
-    saveSolicitudPuesto: 'INSERT INTO Solicitudes_Empleo (Tipo_Puesto_Solicitado, Limitaciones, Deseos, SalarioMax, SalarioMin) VALUES (@tipo_puesto, @limitaciones, @deseos, @salario_max, @salario_min)',
-    saveSolicitudesTipo: 'INSERT INTO Solicitudes_Tipos (ID_Solicitud, ID_Puesto, Tipo_Empleo) VALUES (@ID_Solicitud, @ID_Puesto, @Tipo_Empleo)',
+    saveSolicitudEmpleo: `BEGIN TRANSACTION;
+
+                            INSERT INTO Solicitudes_Empleo (Tipo_Puesto_Solicitado, Limitaciones, Deseos, SalarioMax, SalarioMin)
+                            VALUES (@tipo_puesto_solicitado, @limitaciones, @deseos, @salario_max, @salario_min);
+
+                            DECLARE @NuevoID INT;
+                            SET @NuevoID = SCOPE_IDENTITY();
+
+                            INSERT INTO Solicitudes_Tipos (ID_Solicitud, ID_Solicitante, ID_Puesto)
+                            VALUES (@NuevoID, @id_solicitante, @id_puesto);
+
+                            COMMIT TRANSACTION;`,
+
+    contratarSolicitante: `UPDATE Solicitudes_Tipos
+                            SET Contratado = 1
+                            WHERE ID_Solicitud = @Id;`,
 
     getAllPersonas: `SELECT * FROM Personas`,
     getPersonaByEmail: `SELECT * FROM Personas WHERE email = @email`,

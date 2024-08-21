@@ -1,6 +1,8 @@
 import { Router } from "express";
-import { getEmpresas, getEmpresaById, saveEmpresa, deleteEmpresaById, updateEmpresaById, loginEmpresa,
-     SaveSolicitudEmpleo, getPuestoById, getSolicitudesByEmpresa } from '../controllers/empresas.controllers'
+import {
+     getEmpresas, getEmpresaById, saveEmpresa, deleteEmpresaById, updateEmpresaById, loginEmpresa,
+     SaveSolicitudEmpleo, getPuestoById, getSolicitudesByEmpresa, contratar
+} from '../controllers/empresas.controllers'
 
 const router = Router()
 
@@ -15,6 +17,8 @@ router.post('/empresa/save', saveEmpresa)
 router.post('/empresa/solEmpleo', SaveSolicitudEmpleo)
 
 router.put('/empresa/update/:id', updateEmpresaById)
+
+router.put('/empresa/contratar/:id', contratar)
 
 router.delete('/empresa/delete/:id', deleteEmpresaById)
 

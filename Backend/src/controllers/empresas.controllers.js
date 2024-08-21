@@ -157,47 +157,35 @@ export const loginEmpresa = async (req, res) => {
 };
 
 export const SaveSolicitudEmpleo = async (req, res) => {
-    try{
-        const { tipo_puesto, limitaciones, deseos, salario_max, salario_min, id_solicitudPuesto, tipo_empleo} = req.body;
+    try {
+        const { tipo_puesto_solicitado, limitaciones, deseos, salario_max, salario_min, id_solicitante, id_puesto } = req.body;
 
-        if (!tipo_puesto || !limitaciones || !deseos || !salario_max || !salario_min) {
-            return res.status(400).json({ msg: 'Bad Request. Por favor completar todos los campos'});
+        if (!tipo_puesto_solicitado || !limitaciones || !deseos || !salario_max || !salario_min || !id_solicitante || !id_puesto) {
+            return res.status(400).json({ msg: 'Bad Request. Por favor completar todos los campos' });
         }
 
         const pool = await getConnection();
 
-            await pool.request()
-                .input('tipo_puesto', sql.VarChar, tipo_puesto)
-                .input('limitaciones', sql.VarChar, limitaciones)
-                .input('deseos', sql.VarChar, deseos)
-                .input('salario_max', sql.Float, salario_max)
-                .input('salario_min', sql.Float, salario_min)
-                .query(queries.saveSolicitudPuesto);
+        await pool.request()
+            .input('tipo_puesto_solicitado', sql.VarChar, tipo_puesto_solicitado)
+            .input('limitaciones', sql.VarChar, limitaciones)
+            .input('deseos', sql.VarChar, deseos)
+            .input('salario_max', sql.Float, salario_max)
+            .input('salario_min', sql.Float, salario_min)
+            .input('id_solicitante', sql.Float, id_solicitante)
+            .input('id_puesto', sql.Float, id_puesto)
+            .query(queries.saveSolicitudEmpleo);
 
-            const result = await pool.request()
-                .query(queries.getAllSolEmpleo);
-
-            if (result.recordset.length === 0) {
-                return res.status(401).json({ msg: 'Unauthorized. No hay se genero el empleo de forma eficiente'});
-            }
-
-            const Sol_Empleo = result.recordset[0];
-
-            const id_SolEmpleo = Sol_Empleo.ID_Solicitud
-
-            await pool.request()
-            .input('ID_Solicitud', sql.Int, id_SolEmpleo)
-            .input('ID_Puesto', sql.Int, id_solicitudPuesto)
-            .input('Tipo_Empleo', sql.VarChar, tipo_empleo)
-            .query(queries.saveSolicitudesTipo)
-
-            res.status(201).json({ tipo_puesto, limitaciones, deseos, salario_max, salario_min });
+        res.json({
+            tipo_puesto_solicitado, limitaciones, deseos, salario_max, salario_min, id_solicitante, id_puesto
+        });
 
     } catch (error) {
-        console.error('Error Creating Solicitud de Empleo', error);
-        res.status(500).json({ error: 'Internal Server Error', message: 'Error al guardar la Solicitud de Empleo' });
+        res.status(500);
+        res.send(error.message);
     }
 }
+
 export const getPuestoById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -215,6 +203,7 @@ export const getPuestoById = async (req, res) => {
         res.status(500).json({ message: 'Server error', error });
     }
 };
+
 export const getSolicitudesByEmpresa = async (req, res) => {
     try {
         const { id_empresa } = req.params;
@@ -228,15 +217,42 @@ export const getSolicitudesByEmpresa = async (req, res) => {
             .input('ID_Empresa', sql.Int, id_empresa)
             .query(`
                 select pp.ID_Puesto, pp.ID_Puesto,pt.Tipo_Puesto, pe.Nombre + ' ' +pe.Apellido as Nombre, pt.Condiciones
-                 from dbo.Puestos_Personas pp
-inner join Puestos_Trabajo pt on pp.ID_Puesto = pt.ID_Puesto
-inner join Personas pe on pp.ID_Solicitante = pe.ID_Persona
-where ID_Empresa = @ID_Empresa
+                                from dbo.Puestos_Personas pp
+                inner join Puestos_Trabajo pt on pp.ID_Puesto = pt.ID_Puesto
+                inner join Personas pe on pp.ID_Solicitante = pe.ID_Persona
+                where ID_Empresa = @ID_Empresa
             `);
 
         res.json(result.recordset);
     } catch (error) {
         console.error('Error al obtener las solicitudes:', error); // Log del error
         res.status(500).json({ message: 'Error al obtener las solicitudes', error });
+    }
+};
+
+//
+export const contratar = async (req, res) => {
+
+    try {
+        const { id } = req.params;
+        const pool = await getConnection();
+
+        const updateResult = await pool.request()
+            .input('Id', sql.Int, id)
+            .query(queries.contratarSolicitante);
+
+        if (updateResult.rowsAffected[0] > 0) {
+
+            const result = await pool.request()
+                .input('Id', sql.Int, id)
+                .query('SELECT * FROM Solicitudes_Tipos WHERE ID_Solicitud = @Id');
+
+
+            res.json(result.recordset[0]);
+        } else {
+            res.status(404).json({ message: 'Registro no encontrado o no actualizado' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error en el servidor', error });
     }
 };
