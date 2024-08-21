@@ -204,6 +204,28 @@ export const aplicarTrabajo = async (req, res) => {
     }
 };
 
+export const postularPuesto = async (req, res) => {
+    try {
+        const { id_puesto, id_solicitante } = req.body;
+
+        if (!id_puesto || !id_solicitante) {
+            return res.status(400).json({ message: 'ID_Puesto y ID_Solicitante son requeridos' });
+        }
+
+        const pool = await getConnection();
+        await pool.request()
+            .input('ID_Puesto', sql.Int, id_puesto)
+            .input('ID_Solicitante', sql.BigInt, id_solicitante)
+            .query(`
+                INSERT INTO Puestos_Personas (ID_Puesto, ID_Solicitante)
+                VALUES (@ID_Puesto, @ID_Solicitante)
+            `);
+
+        res.status(201).json({ message: 'Solicitud enviada exitosamente' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al enviar la solicitud', error });
+    }
+};
 /*
 export const updatePersona = async (req, res) =>{
     try {

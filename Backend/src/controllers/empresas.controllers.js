@@ -198,6 +198,45 @@ export const SaveSolicitudEmpleo = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error', message: 'Error al guardar la Solicitud de Empleo' });
     }
 }
+export const getPuestoById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const pool = await getConnection();
+        const result = await pool.request()
+            .input('ID_Puesto', sql.Int, id)
+            .query(queries.getPuestosById);
 
+        if (result.recordset.length === 0) {
+            return res.status(404).json({ message: 'Puesto not found' });
+        }
 
+        res.json(result.recordset[0]);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
+export const getSolicitudesByEmpresa = async (req, res) => {
+    try {
+        const { id_empresa } = req.params;
 
+        if (!id_empresa) {
+            return res.status(400).json({ message: 'ID_Empresa es requerido' });
+        }
+
+        const pool = await getConnection();
+        const result = await pool.request()
+            .input('ID_Empresa', sql.Int, id_empresa)
+            .query(`
+                select pp.ID_Puesto, pp.ID_Puesto,pt.Tipo_Puesto, pe.Nombre + ' ' +pe.Apellido as Nombre, pt.Condiciones
+                 from dbo.Puestos_Personas pp
+inner join Puestos_Trabajo pt on pp.ID_Puesto = pt.ID_Puesto
+inner join Personas pe on pp.ID_Solicitante = pe.ID_Persona
+where ID_Empresa = @ID_Empresa
+            `);
+
+        res.json(result.recordset);
+    } catch (error) {
+        console.error('Error al obtener las solicitudes:', error); // Log del error
+        res.status(500).json({ message: 'Error al obtener las solicitudes', error });
+    }
+};

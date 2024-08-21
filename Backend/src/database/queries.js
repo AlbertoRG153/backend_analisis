@@ -36,6 +36,14 @@ export const queries = {
                     INNER JOIN Empresas e ON pt.ID_Empresa = e.ID_Empresa
                     INNER JOIN TiposRequisitos tr ON pt.ID_Puesto = tr.ID_Puesto
                     INNER JOIN Requisitos r ON tr.IdRequisito = r.IdRequisito`,
+    getPuestosById: `SELECT pt.ID_Puesto, c.Sueldo, pt.Tipo_Puesto, pt.Condiciones, tc.IdTipoContrato,tc.TipoContrato, tc.SalarioPorHora,
+                    tc.horasContrato, e.Nombre AS Empresa, tr.Tipo AS Requisito, r.Requisito AS TipoRequisito FROM Contratos c
+                    INNER JOIN Puestos_Trabajo pt ON c.ID_Puesto = pt.ID_Puesto
+                    INNER JOIN Tipo_Contratos tc ON c.IdTipoContrato = tc.IdTipoContrato
+                    INNER JOIN Empresas e ON pt.ID_Empresa = e.ID_Empresa
+                    INNER JOIN TiposRequisitos tr ON pt.ID_Puesto = tr.ID_Puesto
+                    INNER JOIN Requisitos r ON tr.IdRequisito = r.IdRequisito
+					WHERE pt.ID_Puesto = @ID_Puesto`,
 
     saveRequisito: `INSERT INTO Requisitos (IdRequisito, Requisito) VALUES
                         (@id_requisito, @requisito)`,

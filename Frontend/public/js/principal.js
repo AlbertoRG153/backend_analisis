@@ -36,7 +36,7 @@ function fetchEmpresas() {
                 let content = "";
                 data.forEach(puesto => {
                     content += `
-                        <div class="inner-box" data-toggle="modal" data-target="#myModal2" onclick="renderContrato(${puesto.ID_Puesto}, ${puesto.IdTipoContrato})">
+                        <div class="inner-box" data-toggle="modal" data-target="#myModal2" onclick="renderDetallePuesto(${puesto.ID_Puesto})">
                             <div id="titulo-cajas"><i class="fa-solid fa-briefcase"></i><h5>${puesto.Tipo_Puesto}</h5></div>
                             <p style="color: #B2B2B2;">${puesto.TipoContrato}</p>
                             <p style="color: #B2B2B2;">Empresa: ${puesto.Empresa}</p>
@@ -49,44 +49,41 @@ function fetchEmpresas() {
     }
 
 
-function renderContrato(id_puesto, id_tipo_contrato) {
+function renderDetallePuesto(id_puesto) {
     // Guardar id_solicitud en localStorage
-    localStorage.setItem('idPuesto', id_solicitud);
+    localStorage.setItem('idPuesto', id_puesto);
 
     //solicitud para obtener los detalles del contrato
-    fetch(`http://localhost:4000/contrato/${id_puesto}/${id_tipo_contrato}`)
+    fetch(`http://localhost:4000/puesto/get/${id_puesto}`)
         .then(response => response.json())
         .then(data => {
             const modalBody = `
                 <div id="ventana2" class="modal-body">
-                    <h5>${data.nombre_puesto}</h5>
-                    <h6>${data.tipo_puesto}</h6>
-                    <h6>${data.empresa}</h6>
-                    <p>Sueldo: ${data.sueldo}</p>
-                    <h6>Requisitos:</h6>
-                    <div id="requisitosMod">
-                        ${data.requisitos.map(req => `<p>${req}</p>`).join('')}
-                    </div>
-                    <h6>${data.tipo_contrato}</h6>
+                    <h5>${data.Tipo_Puesto}</h5>
+                    <h6>${data.TipoContrato}</h6>
+                    <h6>${data.Empresa}</h6>
+                    <p>Sueldo: ${data.Sueldo}</p>
+                    <h6>${data.TipoRequisito} : ${data.Requisito}</h6>
+                    <h6> Condiciones: ${data.Condiciones}</h6>
                 </div>
             `;
 
             // Renderizar los datos en el modal
-            document.querySelector('.modal-body').innerHTML = modalBody;
+            document.querySelector('#ventana2').innerHTML = modalBody;
         })
         .catch(error => console.error('Error al obtener los detalles del contrato:', error));
 }
 function postularPuesto() {
     // IDs del localStorage
-    const id_solicitud = localStorage.getItem('id_solicitud');
+    const id_puesto = localStorage.getItem('idPuesto');
     const id_solicitante = localStorage.getItem('personaID');
 
     const body = {
-        id_solicitud: id_solicitud,
+        id_puesto: id_puesto,
         id_solicitante: id_solicitante
     };
-
-    fetch('http://localhost:4000/personas/apliTrabajo', {
+    console.log(body);
+    fetch('http://localhost:4000/postular', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -95,7 +92,7 @@ function postularPuesto() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Solicitud enviada exitosamente:', data);
+        alert('Solicitud enviada exitosamente:', data);
         
     })
     .catch(error => {
