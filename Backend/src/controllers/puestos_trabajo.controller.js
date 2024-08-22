@@ -151,14 +151,36 @@ export const getContratoById = async (req, res) => {
 };
 
 export const getPuestos = async (req, res) => {
-
     try {
         const pool = await getConnection();
-        const result = await pool.request().query(queries.getPuestos);
+        const result = await pool.request()
+            .query(queries.getPuestos);
         res.json(result.recordset);
-
     } catch (error) {
-        res.status(500);
-        res.send(error.message);
+        res.status(500).send({ message: 'Error al obtener los puestos', error: error.message });
+    }
+};
+export const getSolicitudById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const pool = await getConnection();
+        const result = await pool.request()
+            .input('id', sql.Int, id)
+            .query(`
+                SELECT st.ID_Solicitudes_Tipos, st.ID_Puesto, st.ID_Solicitante, st.Contratado, pt.Tipo_Puesto,
+                       tc.TipoContrato, tc.SueldoBase as Sueldo,
+                       pe.Nombre + ' ' + pe.Apellido as Nombre, es.Especialidad
+                FROM Solicitudes_Tipos st
+                INNER JOIN Puestos_Trabajo pt ON st.ID_Puesto = pt.ID_Puesto
+                INNER JOIN Personas pe ON st.ID_Solicitante = pe.ID_Persona
+                INNER JOIN Estudios es ON st.ID_Solicitante = es.Solicitantes_ID_Persona
+                INNER JOIN Contratos co ON pt.ID_Puesto = co.ID_Puesto
+                INNER JOIN Tipo_Contratos tc ON co.IdTipoContrato = tc.IdTipoContrato
+                WHERE st.ID_Solicitudes_Tipos = @id
+            `);
+        res.json(result.recordset[0]);
+    } catch (err) {
+        console.error('Error al obtener la solicitud:', err);
+        res.status(500).send('Error al obtener la solicitud');
     }
 };

@@ -1,11 +1,11 @@
-document.getElementById('EmploginForm').addEventListener('submit', async function(event) {
+document.getElementById('EmploginForm').addEventListener('submit', async function (event) {
     event.preventDefault();
-    
+
     const email = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
     try {
-        const response = await fetch('http://localhost:4000/empresa/login', {
+        const response = await fetch('http://3.144.80.144:4000/empresa/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

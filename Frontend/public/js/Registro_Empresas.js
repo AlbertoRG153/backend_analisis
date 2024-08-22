@@ -1,6 +1,6 @@
-document.getElementById('empresaRegisterForm').addEventListener('submit', async function(event) {
+document.getElementById('empresaRegisterForm').addEventListener('submit', async function (event) {
     event.preventDefault();
-    
+
     const form = event.target;
     const formData = new FormData(form);
 
@@ -13,7 +13,7 @@ document.getElementById('empresaRegisterForm').addEventListener('submit', async 
         email: formData.get('email'),
         estado: 1, // valor fijo
         password: formData.get('password')
-        
+
     };
 
     // Validar los datos
@@ -24,7 +24,7 @@ document.getElementById('empresaRegisterForm').addEventListener('submit', async 
     }
 
     try {
-        const response = await fetch('http://localhost:4000/empresa/save', {
+        const response = await fetch('http://3.144.80.144:4000/empresa/save', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -44,7 +44,7 @@ document.getElementById('empresaRegisterForm').addEventListener('submit', async 
 });
 
 
-document.getElementById('updateButton').addEventListener('click', async function() {
+document.getElementById('updateButton').addEventListener('click', async function () {
     const empresaId = document.getElementById('empresaId').value;
     const formData = new FormData(document.getElementById('empresaRegisterForm'));
     const data = Object.fromEntries(formData.entries());
@@ -52,7 +52,7 @@ document.getElementById('updateButton').addEventListener('click', async function
 
     if (empresaId && isValid) {
         try {
-            const response = await fetch(`http://localhost:4000/empresa/update/${empresaId}`, {
+            const response = await fetch(`http://3.144.80.144:4000/empresa/update/${empresaId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -77,12 +77,12 @@ document.getElementById('updateButton').addEventListener('click', async function
     }
 });
 
-document.getElementById('deleteButton').addEventListener('click', async function() {
+document.getElementById('deleteButton').addEventListener('click', async function () {
     const empresaId = document.getElementById('empresaId').value;
 
     if (empresaId) {
         try {
-            const response = await fetch(`http://localhost:4000/empresa/delete/${empresaId}`, {
+            const response = await fetch(`http://3.144.80.144:4000/empresa/delete/${empresaId}`, {
                 method: 'DELETE'
             });
 

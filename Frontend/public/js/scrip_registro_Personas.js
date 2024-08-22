@@ -5,15 +5,7 @@ document.getElementById('registerForm').addEventListener('submit', function (eve
     let isValid = true;
 
     // Validaciones
-    function validarIdentidad() {
-        const identidad = document.getElementById('identidad').value;
-        const patron = /^[0-9]{13}$/;
-        if (!patron.test(identidad)) {
-            alert('Por favor, ingrese un número de identidad válido de 13 dígitos.');
-            return false;
-        }
-        return true;
-    }
+
     if (!validateText(data.nombre)) {
         markInvalid('nombre');
         isValid = false;
@@ -49,6 +41,18 @@ document.getElementById('registerForm').addEventListener('submit', function (eve
         isValid = false;
     } else {
         markValid('direccion');
+    } if (!function validarIdentidad() {
+        const identidad = document.getElementById('identidad').value;
+        const patron = /^[0-9]{13}$/;
+        if (!patron.test(identidad)) {
+            alert('Por favor, ingrese un número de identidad válido de 13 dígitos.');
+        }
+        return true;
+    }) {
+        markInvalid('identidad');
+        isValid = false;
+    } else {
+        markValid('identidad');
     }
 
     // Validaciones adicionales
@@ -206,13 +210,12 @@ function enviarDatos() {
         email: formData.get('correo'),
         password: formData.get('contrasena'),
         estado: 1, //valor fijo
-        id_familiar: "0000000000",
         nombre_fam: formData.get('nombre_familiar'),
         telefono_fam: formData.get('telefono_familiar'),
         id_parentesco: formData.get('tipo_relacion'),
         tipo_estudio: formData.get('tipo_estudio'),
-        Especialidad: formData.get('especialidad'),
-        Promedio: formData.get('calificacion_media'),
+        especialidad: formData.get('especialidad'),
+        promedio: formData.get('calificacion_media'),
         servicio_militar: formData.get('servicio_militar'),
         relacion_justicia: formData.get('relacion_justicia'),
         info_sanitaria: formData.get('info_sanitaria'),
@@ -223,7 +226,7 @@ function enviarDatos() {
 
     console.log('Datos enviados:', JSON.stringify(datos));
 
-    fetch('http://localhost:4000/personas/save', {
+    fetch('http://3.144.80.144:4000/personas/save', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

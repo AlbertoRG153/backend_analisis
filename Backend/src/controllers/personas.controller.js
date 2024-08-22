@@ -62,7 +62,7 @@ export const loginPersona = async (req, res) => {
 
 export const savePersona = async (req, res) => {
     try {
-        const { identidad, nombre, apellido, fecha_nacimiento, direccion, telefono, email, password, cv, estado, nombre_fam, telefono_fam, id_parentesco, tipo_estudio, especialidad, promedio, servicio_militar, relacion_justicia, info_sanitaria, empresa, puesto, anios_experiencia } = req.body;
+        const { identidad, nombre, apellido, fecha_nacimiento, direccion, telefono, email, password, estado, nombre_fam, telefono_fam, id_parentesco, tipo_estudio, especialidad, promedio, servicio_militar, relacion_justicia, info_sanitaria, empresa, puesto, anios_experiencia } = req.body;
 
         // Validación básica
         if (!identidad || !nombre || !apellido || !fecha_nacimiento || !direccion || !telefono || !email || !password || !nombre_fam || !telefono_fam) {
@@ -217,15 +217,16 @@ export const postularPuesto = async (req, res) => {
             .input('ID_Puesto', sql.Int, id_puesto)
             .input('ID_Solicitante', sql.BigInt, id_solicitante)
             .query(`
-                INSERT INTO Puestos_Personas (ID_Puesto, ID_Solicitante)
-                VALUES (@ID_Puesto, @ID_Solicitante)
+                INSERT INTO Solicitudes_Tipos (ID_Puesto, ID_Solicitante, Contratado)
+                VALUES (@ID_Puesto, @ID_Solicitante, 0)
             `);
 
-        res.status(201).json({ message: 'Solicitud enviada exitosamente' });
+        res.status(201).json({ message: 'Se ha registrado exitosamente' });
     } catch (error) {
         res.status(500).json({ message: 'Error al enviar la solicitud', error });
     }
 };
+
 /*
 export const updatePersona = async (req, res) =>{
     try {

@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const puestoForm = document.getElementById('puesto-form');
-    
+
     puestoForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Enviar datos al backend
-            const response = await fetch('http://localhost:4000/puesto/save', {
+            const response = await fetch('http://3.144.80.144:4000/puesto/save', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

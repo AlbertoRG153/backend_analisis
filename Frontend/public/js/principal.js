@@ -1,10 +1,10 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     fetchEmpresas(),
-    fetchPuestos();
+        fetchPuestos();
 });
 
 function fetchEmpresas() {
-    fetch("http://localhost:4000/empresas/get")
+    fetch("http://3.144.80.144:4000/empresas/get")
         .then(response => {
             if (!response.ok) {
                 throw new Error('la red no responde  ok');
@@ -28,25 +28,25 @@ function fetchEmpresas() {
             console.error('este es el problema:', error);
         });
 }
-    // Función para obtener puestos
-    function fetchPuestos() {
-        fetch("http://localhost:4000/puestos/get")
-            .then(response => response.json())
-            .then(data => {
-                let content = "";
-                data.forEach(puesto => {
-                    content += `
+// Función para obtener puestos, pero solo los que estan activos
+function fetchPuestos() {
+    fetch("http://3.144.80.144:4000/puestos/get")
+        .then(response => response.json())
+        .then(data => {
+            let content = "";
+            data.forEach(puesto => {
+                content += `
                         <div class="inner-box" data-toggle="modal" data-target="#myModal2" onclick="renderDetallePuesto(${puesto.ID_Puesto})">
                             <div id="titulo-cajas"><i class="fa-solid fa-briefcase"></i><h5>${puesto.Tipo_Puesto}</h5></div>
                             <p style="color: #B2B2B2;">${puesto.TipoContrato}</p>
                             <p style="color: #B2B2B2;">Empresa: ${puesto.Empresa}</p>
                         </div>
                     `;
-                });
-                document.getElementById("caja2").innerHTML = content;
-            })
-            .catch(error => console.error('Error al obtener los puestos:', error));
-    }
+            });
+            document.getElementById("caja2").innerHTML = content;
+        })
+        .catch(error => console.error('Error al obtener los puestos:', error));
+}
 
 
 function renderDetallePuesto(id_puesto) {
@@ -54,7 +54,7 @@ function renderDetallePuesto(id_puesto) {
     localStorage.setItem('idPuesto', id_puesto);
 
     //solicitud para obtener los detalles del contrato
-    fetch(`http://localhost:4000/puesto/get/${id_puesto}`)
+    fetch(`http://3.144.80.144:4000/puesto/get/${id_puesto}`)
         .then(response => response.json())
         .then(data => {
             const modalBody = `
@@ -83,25 +83,25 @@ function postularPuesto() {
         id_solicitante: id_solicitante
     };
     console.log(body);
-    fetch('http://localhost:4000/postular', {
+    fetch('http://3.144.80.144:4000/postular', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
     })
-    .then(response => response.json())
-    .then(data => {
-        alert('Solicitud enviada exitosamente:', data);
-        
-    })
-    .catch(error => {
-        console.error('Error al enviar la solicitud:', error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            alert('Se ha registrado exitosamente:', data);
+
+        })
+        .catch(error => {
+            console.error('Error al enviar la solicitud:', error);
+        });
 }
 
 function fetchEmpresaById(id) {
-    fetch(`http://localhost:4000/empresa/get/${id}`)
+    fetch(`http://3.144.80.144:4000/empresa/get/${id}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('la red no responde ok');
