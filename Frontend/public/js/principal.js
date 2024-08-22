@@ -28,7 +28,7 @@ function fetchEmpresas() {
             console.error('este es el problema:', error);
         });
 }
-    // Función para obtener puestos
+    // Función para obtener puestos, pero solo los que estan activos
     function fetchPuestos() {
         fetch("http://localhost:4000/puestos/get")
             .then(response => response.json())
@@ -92,7 +92,7 @@ function postularPuesto() {
     })
     .then(response => response.json())
     .then(data => {
-        alert('Solicitud enviada exitosamente:', data);
+        alert('Se ha registrado exitosamente:', data);
         
     })
     .catch(error => {

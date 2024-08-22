@@ -204,7 +204,7 @@ export const getPuestoById = async (req, res) => {
     }
 };
 
-export const getSolicitudesByEmpresa = async (req, res) => {
+export const getPuestosByEmpresa = async (req, res) => {
     try {
         const { id_empresa } = req.params;
 
@@ -215,44 +215,58 @@ export const getSolicitudesByEmpresa = async (req, res) => {
         const pool = await getConnection();
         const result = await pool.request()
             .input('ID_Empresa', sql.Int, id_empresa)
-            .query(`
-                select pp.ID_Puesto, pp.ID_Puesto,pt.Tipo_Puesto, pe.Nombre + ' ' +pe.Apellido as Nombre, pt.Condiciones
-                                from dbo.Puestos_Personas pp
-                inner join Puestos_Trabajo pt on pp.ID_Puesto = pt.ID_Puesto
-                inner join Personas pe on pp.ID_Solicitante = pe.ID_Persona
-                where ID_Empresa = @ID_Empresa
-            `);
+            .query(queries.getPuestosByEmpresa);
 
         res.json(result.recordset);
     } catch (error) {
-        console.error('Error al obtener las solicitudes:', error); // Log del error
+        console.error('Error al obtener las solicitudes getPuestosByEmpresa:', error); // Log del error
         res.status(500).json({ message: 'Error al obtener las solicitudes', error });
     }
 };
 
+
 //
 export const contratar = async (req, res) => {
-
     try {
-        const { id } = req.params;
+        const { ID_Solicitudes_Tipos, ID_Solicitante } = req.body;
         const pool = await getConnection();
 
         const updateResult = await pool.request()
-            .input('Id', sql.Int, id)
+            .input('ID_Solicitudes_Tipos', sql.Int, ID_Solicitudes_Tipos)
+            .input('ID_Solicitante', sql.BigInt, ID_Solicitante)
             .query(queries.contratarSolicitante);
 
         if (updateResult.rowsAffected[0] > 0) {
-
             const result = await pool.request()
-                .input('Id', sql.Int, id)
-                .query('SELECT * FROM Solicitudes_Tipos WHERE ID_Solicitud = @Id');
-
+                .input('ID_Solicitudes_Tipos', sql.Int, ID_Solicitudes_Tipos)
+                .input('ID_Solicitante', sql.BigInt, ID_Solicitante)
+                .query('SELECT * FROM Solicitudes_Tipos WHERE ID_Solicitudes_Tipos = @ID_Solicitudes_Tipos AND ID_Solicitante = @ID_Solicitante');
 
             res.json(result.recordset[0]);
         } else {
             res.status(404).json({ message: 'Registro no encontrado o no actualizado' });
         }
     } catch (error) {
+        console.error('Error en el servidor:', error);
         res.status(500).json({ message: 'Error en el servidor', error });
+    }
+};
+//
+export const getSolicitudesByEmpresa = async (req, res) => {
+    const { empresaID } = req.params;
+    try {
+        const pool = await getConnection();
+        const result = await pool.request()
+            .input('empresaID', sql.Int, empresaID)
+            .query(queries.getSolicitudesByEmpresa);
+
+        if (result.recordset.length === 0) {
+            return res.status(404).json({ message: 'No se encontraron solicitudes para esta empresa.' });
+        }
+
+        res.json(result.recordset);
+    } catch (err) {
+        console.error('Error al obtener las solicitudes:', err);
+        res.status(500).send('Error al obtener las solicitudes');
     }
 };

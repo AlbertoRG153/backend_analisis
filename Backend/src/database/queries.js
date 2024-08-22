@@ -29,13 +29,16 @@ export const queries = {
                         INNER JOIN TiposRequisitos tr ON pt.ID_Puesto = tr.ID_Puesto
                         INNER JOIN Requisitos r ON tr.IdRequisito = r.IdRequisito
                         WHERE c.ID_Puesto = @id_puesto AND c.IdTipoContrato = @id_tipo_contrato`,
+    //los puestos disponibles                    
     getPuestos: `SELECT pt.ID_Puesto, c.Sueldo, pt.Tipo_Puesto, pt.Condiciones, tc.IdTipoContrato,tc.TipoContrato, tc.SalarioPorHora,
                     tc.horasContrato, e.Nombre AS Empresa, tr.Tipo AS Requisito, r.Requisito AS TipoRequisito FROM Contratos c
                     INNER JOIN Puestos_Trabajo pt ON c.ID_Puesto = pt.ID_Puesto
                     INNER JOIN Tipo_Contratos tc ON c.IdTipoContrato = tc.IdTipoContrato
                     INNER JOIN Empresas e ON pt.ID_Empresa = e.ID_Empresa
                     INNER JOIN TiposRequisitos tr ON pt.ID_Puesto = tr.ID_Puesto
-                    INNER JOIN Requisitos r ON tr.IdRequisito = r.IdRequisito`,
+                    INNER JOIN Requisitos r ON tr.IdRequisito = r.IdRequisito
+					LEFT JOIN Solicitudes_Tipos st ON st.ID_Puesto = c.ID_Puesto
+					WHERE st.Contratado != 1 or st.Contratado is null`,
     getPuestosById: `SELECT pt.ID_Puesto, c.Sueldo, pt.Tipo_Puesto, pt.Condiciones, tc.IdTipoContrato,tc.TipoContrato, tc.SalarioPorHora,
                     tc.horasContrato, e.Nombre AS Empresa, tr.Tipo AS Requisito, r.Requisito AS TipoRequisito FROM Contratos c
                     INNER JOIN Puestos_Trabajo pt ON c.ID_Puesto = pt.ID_Puesto
@@ -44,6 +47,26 @@ export const queries = {
                     INNER JOIN TiposRequisitos tr ON pt.ID_Puesto = tr.ID_Puesto
                     INNER JOIN Requisitos r ON tr.IdRequisito = r.IdRequisito
 					WHERE pt.ID_Puesto = @ID_Puesto`,
+    getPuestosByEmpresa: `SELECT pt.ID_Puesto, c.Sueldo, pt.Tipo_Puesto, pt.Condiciones, tc.IdTipoContrato,tc.TipoContrato, tc.SalarioPorHora,
+                    tc.horasContrato, e.Nombre AS Empresa, tr.Tipo AS Requisito, r.Requisito AS TipoRequisito FROM Contratos c
+                    INNER JOIN Puestos_Trabajo pt ON c.ID_Puesto = pt.ID_Puesto
+                    INNER JOIN Tipo_Contratos tc ON c.IdTipoContrato = tc.IdTipoContrato
+                    INNER JOIN Empresas e ON pt.ID_Empresa = e.ID_Empresa
+                    INNER JOIN TiposRequisitos tr ON pt.ID_Puesto = tr.ID_Puesto
+                    INNER JOIN Requisitos r ON tr.IdRequisito = r.IdRequisito
+					WHERE e.ID_Empresa = @ID_Empresa`,
+    getSolicitudesByEmpresa: `
+        SELECT st.ID_Solicitudes_Tipos, st.ID_Puesto, st.ID_Solicitante, st.Contratado, pt.Tipo_Puesto,
+               tc.TipoContrato, tc.SueldoBase as Sueldo,
+               pe.Nombre + ' ' + pe.Apellido as Nombre, es.Especialidad
+        FROM Solicitudes_Tipos st
+        INNER JOIN Puestos_Trabajo pt ON st.ID_Puesto = pt.ID_Puesto
+        INNER JOIN Personas pe ON st.ID_Solicitante = pe.ID_Persona
+        INNER JOIN Estudios es ON st.ID_Solicitante = es.Solicitantes_ID_Persona
+        INNER JOIN Contratos co ON pt.ID_Puesto = co.ID_Puesto
+        INNER JOIN Tipo_Contratos tc ON co.IdTipoContrato = tc.IdTipoContrato
+        WHERE pt.ID_Empresa = @empresaID and st.Contratado != 1
+    `,
 
     saveRequisito: `INSERT INTO Requisitos (IdRequisito, Requisito) VALUES
                         (@id_requisito, @requisito)`,
@@ -62,10 +85,11 @@ export const queries = {
                             VALUES (@NuevoID, @id_solicitante, @id_puesto);
 
                             COMMIT TRANSACTION;`,
-
-    contratarSolicitante: `UPDATE Solicitudes_Tipos
-                            SET Contratado = 1
-                            WHERE ID_Solicitud = @Id;`,
+    contratarSolicitante: `
+        UPDATE Solicitudes_Tipos
+        SET Contratado = 1
+        WHERE ID_Solicitudes_Tipos = @ID_Solicitudes_Tipos AND ID_Solicitante = @ID_Solicitante;
+    `,
 
     getAllPersonas: `SELECT * FROM Personas`,
     getPersonaByEmail: `SELECT * FROM Personas WHERE email = @email`,
@@ -77,7 +101,7 @@ export const queries = {
     saveInfoLegal: 'INSERT INTO Datos_Legales (Servicio_Militar, Relacion_Justicia, Solicitantes_ID_Persona) VALUES (@servicio_militar, @relacion_justicia, @solicitante_Id_Persona)',
     saveInfoSanitaria: 'INSERT INTO Datos_Sanitarios (ID_Persona, Informacion_Sanitaria, Solicitantes_ID_Persona) VALUES (@id_persona_San, @info_sanitaria, @solicitante_id_Persona)',
     saveExperienciaLaboral: `INSERT INTO Experiencia_Laboral (ID_Solicitante, Empresa, Puesto, Anios_Experiencia, Solicitantes_ID_Persona) VALUES (@id_persona, @empresa, @puesto, @anios_experiencia, @solicitante_Id_Persona)`,
-    getAllSolEmpleo: 'SELECT * FROM Solicitudes_Empleo',
-    ApliCTrabajo: 'UPDATE Solicitudes_Tipos SET ID_Solicitante = @ID_Solicitante WHERE ID_Solicitud = @ID_Solicitud',
-    saveReqEmpleo: 'INSERT INTO Requisitos_Empleo (ID_Solicitante, Tipo_Puesto, Condiciones, Salario, Solicitantes_ID_Persona) VALUES (@id_solicitante, @tipo_puesto, @condiciones, @salario, @id_solicitantes)'
+    saveReqEmpleo: 'INSERT INTO Requisitos_Empleo (ID_Solicitante, Tipo_Puesto, Condiciones, Salario, Solicitantes_ID_Persona) VALUES (@id_solicitante, @tipo_puesto, @condiciones, @salario, @id_solicitantes)',
+     ApliCTrabajo: 'UPDATE Solicitudes_Tipos SET ID_Solicitante = @ID_Solicitante WHERE ID_Solicitud = @ID_Solicitud',
+     getAllSolEmpleo: 'SELECT * FROM Solicitudes_Empleo'
 };
