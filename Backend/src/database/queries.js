@@ -103,5 +103,20 @@ export const queries = {
     saveExperienciaLaboral: `INSERT INTO Experiencia_Laboral (ID_Solicitante, Empresa, Puesto, Anios_Experiencia, Solicitantes_ID_Persona) VALUES (@id_persona, @empresa, @puesto, @anios_experiencia, @solicitante_Id_Persona)`,
     saveReqEmpleo: 'INSERT INTO Requisitos_Empleo (ID_Solicitante, Tipo_Puesto, Condiciones, Salario, Solicitantes_ID_Persona) VALUES (@id_solicitante, @tipo_puesto, @condiciones, @salario, @id_solicitantes)',
      ApliCTrabajo: 'UPDATE Solicitudes_Tipos SET ID_Solicitante = @ID_Solicitante WHERE ID_Solicitud = @ID_Solicitud',
-     getAllSolEmpleo: 'SELECT * FROM Solicitudes_Empleo'
+     getAllSolEmpleo: 'SELECT * FROM Solicitudes_Empleo',
+     savePuesto1: `INSERT INTO Puestos_Trabajo (Tipo_Puesto, Condiciones, ID_Empresa) VALUES (@tipo_puesto, @condiciones, @id_empresa); SELECT SCOPE_IDENTITY() AS ID_Puesto;`,
+    saveTipoContrato1: `INSERT INTO Tipo_Contratos (TipoContrato, SalarioPorHora, horasContrato) VALUES (@tipo_contrato, @salario_por_hora, @horas_contrato); SELECT SCOPE_IDENTITY() AS IdTipoContrato;`,
+    saveContrato1: `INSERT INTO Contratos (Sueldo, ID_Puesto, IdTipoContrato) VALUES ((SELECT SueldoBase FROM Tipo_Contratos WHERE Tipo_Contratos.IdTipoContrato = @id_tipo_contrato), @id_puesto, @id_tipo_contrato);`,
+    saveRequisito1: `INSERT INTO Requisitos (Requisito) VALUES (@requisito); SELECT SCOPE_IDENTITY() AS IdRequisito;`,
+    saveTipoRequisito1: `INSERT INTO TiposRequisitos (IDTipoRequisito, IdRequisito, ID_Puesto, Tipo) VALUES (@id_tipo_requisito, @id_requisito, @id_puesto, @tipo);`,
+    getPuestoDetails: `
+        SELECT pt.ID_Puesto, c.Sueldo, pt.Tipo_Puesto, pt.Condiciones, tc.IdTipoContrato, tc.TipoContrato, tc.SalarioPorHora, tc.horasContrato, e.Nombre AS Empresa, r.Requisito, tr.Tipo AS TipoRequisito
+        FROM Puestos_Trabajo pt
+        INNER JOIN Contratos c ON pt.ID_Puesto = c.ID_Puesto
+        INNER JOIN Tipo_Contratos tc ON c.IdTipoContrato = tc.IdTipoContrato
+        INNER JOIN Empresas e ON pt.ID_Empresa = e.ID_Empresa
+        INNER JOIN TiposRequisitos tr ON pt.ID_Puesto = tr.ID_Puesto
+        INNER JOIN Requisitos r ON tr.IdRequisito = r.IdRequisito
+        WHERE pt.ID_Puesto = @id_puesto;
+    `
 };

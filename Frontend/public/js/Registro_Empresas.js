@@ -35,12 +35,15 @@ document.getElementById('empresaRegisterForm').addEventListener('submit', async 
         const result = await response.json();
         if (response.ok) {
             alert('Empresa registrada con éxito');
+            window.location.href = 'registroEmpresas.html';
         } else {
             alert('Error: ' + result.msg);
         }
     } catch (error) {
         console.error('Error:', error);
+        alert('Error al registrar la empresa');
     }
+
 });
 
 
