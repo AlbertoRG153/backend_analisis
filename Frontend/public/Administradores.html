@@ -243,7 +243,7 @@
 
             // Función para obtener empresas
             function fetchEmpresas() {
-                $.get("http://localhost:4000/empresas/get", function (data) {
+                $.get("http://3.144.80.144:4000/empresas/get", function (data) {
                     let rows = "";
                     data.forEach(empresa => {
                         rows += `
@@ -264,7 +264,7 @@
 
             // Función para editar empresa
             window.editEmpresa = function (id) {
-                $.get(`http://localhost:4000/empresa/get/${id}`, function (data) {
+                $.get(`http://3.144.80.144:4000/empresa/get/${id}`, function (data) {
                     $("#empresaId").val(data.empresa.ID_Empresa);
                     $("#nombreEmpresa").val(data.Nombre);
                     $("#cif").val(data.CIF);
@@ -291,7 +291,7 @@
                 };
 
                 $.ajax({
-                    url: `http://localhost:4000/empresa/update/${id}`,
+                    url: `http://3.144.80.144:4000/empresa/update/${id}`,
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify(empresa),
@@ -306,7 +306,7 @@
             window.deleteEmpresa = function (ID_Empresa, Nombre) {
                 if (confirm(`¿Estás seguro de que deseas eliminar ${Nombre}?`)) {
                     $.ajax({
-                        url: `http://localhost:4000/empresa/delete/${ID_Empresa}`,
+                        url: `http://3.144.80.144:4000/empresa/delete/${ID_Empresa}`,
                         type: 'DELETE',
                         success: function () {
                             fetchEmpresas();
