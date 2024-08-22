@@ -224,7 +224,7 @@ function enviarDatos() {
         anios_experiencia: formData.get('anos_experiencia')
     };
 
-    console.log('Datos enviados:', JSON.stringify(datos));
+    //console.log('Datos enviados:', JSON.stringify(datos));
 
     fetch('http://localhost:4000/personas/save', {
         method: 'POST',
@@ -234,6 +234,36 @@ function enviarDatos() {
         body: JSON.stringify(datos)
     })
         .then(response => response.json())
-        .then(data => console.log('Success:', data))
-        .catch(error => console.error('Error:', error));
+        .then(data => {
+            console.log('Success:', data);
+            alert('Solicitante registrado con éxito');
+            window.location.href = 'registroPersonas.html';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al registrar el solicitante');
+        });       
 }
+document.getElementById('departamento').addEventListener('change', function() {
+    const departamento = this.value;
+    const ciudadSelect = document.getElementById('ciudad');
+    ciudadSelect.innerHTML = '<option value="">Seleccione la ciudad</option>'; // Resetear las opciones
+
+    const ciudades = {
+        atlantida: ['La Ceiba', 'Tela', 'Jutiapa'],choluteca: ['Choluteca', 'San Marcos de Colón', 'El Triunfo'],colon: ['Trujillo', 'Tocoa', 'Bonito Oriental'],
+        comayagua: ['Comayagua', 'Siguatepeque', 'La Libertad'],copan: ['Santa Rosa de Copán', 'Copán Ruinas', 'La Entrada'],cortes: ['San Pedro Sula', 'Puerto Cortés', 'La Lima'],
+        el_paraiso: ['Yuscarán', 'Danlí', 'El Paraíso'],francisco_morazan: ['Tegucigalpa', 'Comayagüela', 'Valle de Ángeles'],gracias_a_dios: ['Puerto Lempira', 'Brus Laguna', 'Ahuas'],
+        intibuca: ['La Esperanza', 'Jesús de Otoro', 'Yamaranguila'],islas_de_la_bahia: ['Roatán', 'Utila', 'Guanaja'],la_paz: ['La Paz', 'Marcala', 'San Pedro de Tutule'],
+        lempira: ['Gracias', 'La Iguala', 'Erandique'],ocotepeque: ['Ocotepeque', 'La Encarnación', 'San Marcos'],olancho: ['Juticalpa', 'Catacamas', 'Campamento'],
+        santa_barbara: ['Santa Bárbara', 'Trinidad', 'San Vicente Centenario'],valle: ['Nacaome', 'San Lorenzo', 'Langue'],yoro: ['Yoro', 'El Progreso', 'Olanchito']
+    };
+
+    if (ciudades[departamento]) {
+        ciudades[departamento].forEach(function(ciudad) {
+            const option = document.createElement('option');
+            option.value = ciudad.toLowerCase().replace(/\s+/g, '_');
+            option.textContent = ciudad;
+            ciudadSelect.appendChild(option);
+        });
+    }
+});

@@ -11,20 +11,55 @@
         <h1>Registrar Nuevo Puesto</h1>
         <form id="puestoForm">
             <div class="input-group">
-                <label for="tipo_puesto">Tipo de Puesto</label>
-                <input type="text" id="tipo_puesto" name="tipo_puesto" required>
+                <label for="tipo_puesto">Puesto</label>
+                <input type="text" id="tipo_puesto" name="tipo_puesto" required placeholder="Programador Jr">
             </div>
             <div class="input-group">
                 <label for="condiciones">Condiciones</label>
-                <input type="text" id="condiciones" name="condiciones" required>
+                <input type="text" id="condiciones" name="condiciones" required placeholder="Trabajar bajo presion">
             </div>
             <div class="input-group">
-                <label for="id_empresa">ID Empresa</label>
-                <input type="number" id="id_empresa" name="id_empresa" required>
+                <label for="tipo_contrato">Tipo de Contrato</label>
+<select id="tipo_contrato" name="tipo_contrato" required>
+    <option value="Tiempo Completo">Tiempo Completo</option>
+    <option value="Medio Tiempo">Medio Tiempo</option>
+    <option value="Por Proyecto">Por Proyecto</option>
+    <option value="Freelance">Freelance</option>
+    <option value="Practicas">Prácticas</option>
+    <option value="Consultorias">Consultorías</option>
+    <option value="Temporal">Temporal</option>
+</select>
             </div>
+            <div class="input-group-inline"> 
+             <div class="input-group">
+                <label for="salario_por_hora">Salario por Hora</label>
+                <input type="number" id="salario_por_hora" name="salario_por_hora" min="1" max="20000" required>
+            </div>
+            <div class="input-group">
+                <label for="horas_contrato">Horas de Contrato</label>
+                <input type="number" id="horas_contrato" name="horas_contrato" min="10" max="40" required>
+            </div></div>
+            <div class="input-group-inline">
+               <div class="input-group">
+                <label for="idrequisito">Tipo de Requisito</label>
+                <select id="idrequisito" name="idrequisito" required>
+                    <option value="1">Capacidades</option>
+                    <option value="2">Experiencia mínima</option>
+                    <option value="3">Certificaciones</option>
+                    <option value="4">Titulo Universitario</option>
+                    <option value="5">Disponibilidad de Horarios</option>
+                </select>                
+             </div>
+             <div class="input-group">
+                <label for="tipo">Requisito</label>
+                <input type="text" id="tipo" name="tipo" placeholder="Conocimientos en Js, Html, Css" required>
+            </div> 
+            </div>         
             <button type="submit">Guardar</button>
         </form>
     </div>
-    <script src="js/nuevoPuesto.js"></script>
+    <script src="./js/nuevoPuesto.js"></script>
 </body>
+
+
 </html>

@@ -184,3 +184,65 @@ export const getSolicitudById = async (req, res) => {
         res.status(500).send('Error al obtener la solicitud');
     }
 };
+
+export const savePuestoCompleto = async (req, res) => {
+    const { tipo_puesto, condiciones, id_empresa, tipo_contrato, salario_por_hora, horas_contrato, idrequisito, tipo } = req.body;
+
+    if (!tipo_puesto || !condiciones || !id_empresa || !tipo_contrato || !salario_por_hora || !horas_contrato || !idrequisito || !tipo) {
+        return res.status(400).json({ msg: 'Bad Request. Por favor llena todos los campos' });
+    }
+
+    let transaction;
+
+    try {
+        const pool = await getConnection();
+        transaction = new sql.Transaction(pool);
+
+        await transaction.begin();
+
+        // Guardar Puesto
+        const puestoResult = await transaction.request()
+            .input('tipo_puesto', sql.VarChar, tipo_puesto)
+            .input('condiciones', sql.VarChar, condiciones)
+            .input('id_empresa', sql.Int, id_empresa)
+            .query(queries.savePuesto1);
+        const id_puesto = puestoResult.recordset[0].ID_Puesto;
+
+        // Guardar Tipo de Contrato
+        const tipoContratoResult = await transaction.request()
+            .input('tipo_contrato', sql.VarChar, tipo_contrato)
+            .input('salario_por_hora', sql.Float, salario_por_hora)
+            .input('horas_contrato', sql.Int, horas_contrato)
+            .query(queries.saveTipoContrato1);
+        const id_tipo_contrato = tipoContratoResult.recordset[0].IdTipoContrato;
+
+        // Guardar Contrato
+        await transaction.request()
+            .input('id_puesto', sql.Int, id_puesto)
+            .input('id_tipo_contrato', sql.Int, id_tipo_contrato)
+            .query(queries.saveContrato1);
+
+        // Guardar Tipo de Requisito
+        await transaction.request()
+            .input('id_tipo_requisito', sql.Int, id_puesto) // Usar id_puesto como id_tipo_requisito
+            .input('id_requisito', sql.Int, idrequisito)
+            .input('id_puesto', sql.Int, id_puesto)
+            .input('tipo', sql.VarChar, tipo)
+            .query(queries.saveTipoRequisito1);
+
+        // Obtener los detalles del puesto guardado
+        const puestoDetails = await transaction.request()
+            .input('id_puesto', sql.Int, id_puesto)
+            .query(queries.getPuestoDetails);
+
+        await transaction.commit();
+
+        res.json(puestoDetails.recordset);
+    } catch (error) {
+        if (transaction) {
+            await transaction.rollback();
+        }
+        console.error('Error al guardar el puesto completo:', error);
+        res.status(500).json({ message: 'Error al guardar el puesto completo', error });
+    }
+};
